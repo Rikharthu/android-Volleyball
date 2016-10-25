@@ -4,6 +4,7 @@ package com.example.android.volleyball;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v4.util.LruCache;
+import android.util.Log;
 
 import com.android.volley.Cache;
 import com.android.volley.Network;
@@ -14,6 +15,8 @@ import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
+
+import java.util.Iterator;
 
 public class MySingleton {
     private static MySingleton mInstance;
@@ -30,15 +33,21 @@ public class MySingleton {
                     private final LruCache<String, Bitmap>
                             cache = new LruCache<String, Bitmap>(20);
 
+                    // Image will be downloaded once. Then it will be put to cache
+                    // and retrieved from it ratehr than downloading again
                     @Override
                     public Bitmap getBitmap(String url) {
+                        Log.d("MySingleton","getBitmap() for "+url);
+                        Log.d("MySingleton","Cache content: "+cache.size());
                         return cache.get(url);
                     }
 
                     @Override
                     public void putBitmap(String url, Bitmap bitmap) {
+                        Log.d("MySingleton","putBitmap()");
                         cache.put(url, bitmap);
                     }
+
                 });
     }
 

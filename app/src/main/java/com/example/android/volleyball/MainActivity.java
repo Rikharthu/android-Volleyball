@@ -7,11 +7,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Cache;
 import com.android.volley.Network;
@@ -30,6 +33,9 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -44,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
     Button mDownloadButton;
     @BindView(R.id.downloadImgButton)
     Button mDownloadImgButton;
+    @BindView(R.id.spinner)
+    Spinner mUrlSpinner;
     @BindView(R.id.imageView)
     ImageView mImageView;
     @BindView(R.id.networkImageView)
@@ -72,6 +80,18 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         mOutputTextView.setText(R.string.doc);
+
+        List<String> list=new ArrayList<String>();
+        list.add("Item 1");
+        list.add("Item 2");
+        list.add("Item 3");
+        list.add("Item 4");
+        list.add("Item 5");
+        ArrayAdapter<String> adp1=new ArrayAdapter<>(this,
+                android.R.layout.simple_list_item_1,list);
+        adp1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mUrlSpinner.setAdapter(adp1);
+
         mDownloadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -81,14 +101,23 @@ public class MainActivity extends AppCompatActivity {
         mDownloadImgButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String url = (String) mUrlSpinner.getSelectedItem();
+                Log.d(TAG,"image url: "+url);
                 mOutputTextView.setText("");
 //                downloadImage();
                 // You can also use ImageLoader to download and set image
                 // Get the ImageLoader through your singleton class.
                 mImageLoader = MySingleton.getInstance(MainActivity.this).getImageLoader();
+                boolean isCached=mImageLoader.isCached(IMAGE_URL,0,0);
+                Log.d(TAG,"is image cached? "+isCached);
+                // TODO создать спиннер для выбора ссылок картинок для проверки кэша
+                if(isCached){
+                    Toast.makeText(MainActivity.this, "Image retrieved from the cache", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(MainActivity.this, "Image downloaded", Toast.LENGTH_SHORT).show();
+                }
                 mImageLoader.get(IMAGE_URL, ImageLoader.getImageListener(mImageView,
                         android.R.drawable.alert_dark_frame, android.R.drawable.alert_dark_frame));
-                Log.d(TAG,"is image cached? "+mImageLoader.isCached(IMAGE_URL,1000,1000));
             }
         });
 
