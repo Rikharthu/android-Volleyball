@@ -28,8 +28,12 @@ public class MySingleton {
         mCtx = context;
         mRequestQueue = getRequestQueue();
 
+        // a helper class that handles loading and caching images from remote URLs
+        // provides an in-memory cache to sit in front of the normal Volley cache
         mImageLoader = new ImageLoader(mRequestQueue,
+                // provide a custom in-memory cache
                 new ImageLoader.ImageCache() {
+
                     private final LruCache<String, Bitmap>
                             cache = new LruCache<String, Bitmap>(20);
 
@@ -37,18 +41,22 @@ public class MySingleton {
                     // and retrieved from it ratehr than downloading again
                     @Override
                     public Bitmap getBitmap(String url) {
-                        Log.d("MySingleton","getBitmap() for "+url);
-                        Log.d("MySingleton","Cache content: "+cache.size());
+                        Log.d("ImageLoader Cache","getBitmap() for "+url);
+                        Log.d("ImageLoader Cache","cache size: "+cache.size());
                         return cache.get(url);
                     }
 
                     @Override
                     public void putBitmap(String url, Bitmap bitmap) {
-                        Log.d("MySingleton","putBitmap()");
+                        Log.d("ImageLoader Cache","putBitmap()");
+                        Log.d("ImageLoader Cache","cache size: "+cache.size());
                         cache.put(url, bitmap);
                     }
 
                 });
+        // TODO посмотреть как и сколько сохраняет
+        // or use our LruBitmapCache
+        // mImageLoader= new ImageLoader(mRequestQueue,new LruBitmapCache(mCtx));
     }
 
     public static synchronized MySingleton getInstance(Context context) {

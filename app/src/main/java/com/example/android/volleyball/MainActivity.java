@@ -112,16 +112,24 @@ public class MainActivity extends AppCompatActivity {
                 // You can also use ImageLoader to download and set image
                 // Get the ImageLoader through your singleton class.
                 mImageLoader = MySingleton.getInstance(MainActivity.this).getImageLoader();
+                // check if this image is available in the cache
                 boolean isCached=mImageLoader.isCached(IMAGE_URL,0,0);
-                Log.d(TAG,"is image cached? "+isCached);
-                // TODO создать спиннер для выбора ссылок картинок для проверки кэша
                 if(isCached){
-                    Toast.makeText(MainActivity.this, "Image retrieved from the cache", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Image was retrieved from the cache", Toast.LENGTH_SHORT).show();
                 }else{
-                    Toast.makeText(MainActivity.this, "Image downloaded", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Image was downloaded from the internet", Toast.LENGTH_SHORT).show();
                 }
+                // TODO создать спиннер для выбора ссылок картинок для проверки кэша
+                // You can use ImageLoader by itself to display an image:
                 mImageLoader.get(IMAGE_URL, ImageLoader.getImageListener(mImageView,
                         android.R.drawable.alert_dark_frame, android.R.drawable.alert_dark_frame));
+                // However, NetworkImageView can do this for you
+                /* builds on ImageLoader and effectively replaces ImageView for situations
+                 where your image is being fetched over the network via URL.
+                 NetworkImageView also manages canceling pending requests
+                 if the view is detached from the hierarchy. */
+                mNetworkImageView.setImageUrl(IMAGE_URL, mImageLoader);
+
             }
         });
 
@@ -185,8 +193,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /** Retrieves an image specified by the URL, displays it in the UI. */
     private void downloadImage(){
-        // Retrieves an image specified by the URL, displays it in the UI.
+        //  request for getting an image at a given URL and calling back with a decoded bitmap
         ImageRequest request = new ImageRequest(IMAGE_URL,
                 new Response.Listener<Bitmap>() {
                     @Override
