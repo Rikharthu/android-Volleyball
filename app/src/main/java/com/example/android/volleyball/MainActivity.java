@@ -34,7 +34,9 @@ import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -80,15 +82,14 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         mOutputTextView.setText(R.string.doc);
-
-        List<String> list=new ArrayList<String>();
-        list.add("Item 1");
-        list.add("Item 2");
-        list.add("Item 3");
-        list.add("Item 4");
-        list.add("Item 5");
+        List<String> spinnerTitles=new ArrayList<String>();
+        spinnerTitles.add("Phosphor");
+        spinnerTitles.add("Item 2");
+        spinnerTitles.add("Item 3");
+        spinnerTitles.add("Item 4");
+        spinnerTitles.add("Item 5");
         ArrayAdapter<String> adp1=new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1,list);
+                android.R.layout.simple_list_item_1,spinnerTitles);
         adp1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mUrlSpinner.setAdapter(adp1);
 
