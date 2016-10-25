@@ -102,6 +102,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String url = (String) mUrlSpinner.getSelectedItem();
+                // TODO use this
+                mUrlSpinner.getSelectedItemPosition();
+
                 Log.d(TAG,"image url: "+url);
                 mOutputTextView.setText("");
 //                downloadImage();
