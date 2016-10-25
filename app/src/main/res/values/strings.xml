@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Volleyball</string>
+    <string name="doc">At a high level, you use Volley by creating a RequestQueue and passing it
+        Request objects. The RequestQueue manages worker threads for running the network operations,
+        reading from and writing to the cache, and parsing responses. Requests do the parsing of raw
+        responses and Volley takes care of dispatching the parsed response back to the main thread
+        for delivery.
+    </string>
+</resources>
