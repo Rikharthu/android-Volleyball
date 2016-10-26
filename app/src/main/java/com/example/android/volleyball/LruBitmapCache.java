@@ -45,4 +45,6 @@ public class LruBitmapCache extends LruCache<String, Bitmap>
 
         return screenBytes * 3;
     }
+
+
 }

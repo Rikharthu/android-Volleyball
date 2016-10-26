@@ -27,6 +27,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" android:id="@+id/downloadImgButton"
     />
+    <Button
+        android:text="Show Cache"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:id="@+id/showCacheButton"
+    />
     <TextView
         android:id="@+id/output"
         android:layout_width="match_parent"

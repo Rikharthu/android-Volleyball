@@ -52,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
     Button mDownloadButton;
     @BindView(R.id.downloadImgButton)
     Button mDownloadImgButton;
+    @BindView(R.id.showCacheButton)
+    Button mShowCacheButton;
     @BindView(R.id.spinner)
     Spinner mUrlSpinner;
     @BindView(R.id.imageView)
@@ -69,6 +71,13 @@ public class MainActivity extends AppCompatActivity {
         }  */
     private static final String REQUEST_VASJA_PUPKIN="VASJA_PUPKIN";
     public static final String IMAGE_URL="http://images.genius.com/2c9cbdbe9db317402a551462934980db.444x444x1.jpg";
+    public static final String[] IMAGE_LINKS=
+            {
+                    "http://images.genius.com/2c9cbdbe9db317402a551462934980db.444x444x1.jpg" // Phosphor
+                    ,"https://crackberry.com/sites/crackberry.com/files/styles/large/public/topic_images/2013/ANDROID.png?itok=xhm7jaxS" // Android
+                    ,"http://geology.com/world/world-map.gif" // Map
+                    ,"http://getpcsoft.wikisend.com/img_howto/0/307/grand_theft_auto_vice_city_by_progressivez-d38prca.jpg" // Vice City
+            };
     boolean isInternetAllowed=true;
     private Gson mGson;
 
@@ -84,10 +93,9 @@ public class MainActivity extends AppCompatActivity {
         mOutputTextView.setText(R.string.doc);
         List<String> spinnerTitles=new ArrayList<String>();
         spinnerTitles.add("Phosphor");
-        spinnerTitles.add("Item 2");
-        spinnerTitles.add("Item 3");
-        spinnerTitles.add("Item 4");
-        spinnerTitles.add("Item 5");
+        spinnerTitles.add("Android");
+        spinnerTitles.add("Map");
+        spinnerTitles.add("Vice City");
         ArrayAdapter<String> adp1=new ArrayAdapter<>(this,
                 android.R.layout.simple_list_item_1,spinnerTitles);
         adp1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -97,41 +105,46 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 downloadJSON();
+//                downloadGson();
             }
         });
         mDownloadImgButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String url = (String) mUrlSpinner.getSelectedItem();
-                // TODO use this
-                mUrlSpinner.getSelectedItemPosition();
+                String url = IMAGE_LINKS[mUrlSpinner.getSelectedItemPosition()];
 
                 Log.d(TAG,"image url: "+url);
                 mOutputTextView.setText("");
+                // Download an image using ImageRequest
 //                downloadImage();
+
                 // You can also use ImageLoader to download and set image
                 // Get the ImageLoader through your singleton class.
                 mImageLoader = MySingleton.getInstance(MainActivity.this).getImageLoader();
                 // check if this image is available in the cache
-                boolean isCached=mImageLoader.isCached(IMAGE_URL,0,0);
+
+                boolean isCached=mImageLoader.isCached(url,0,0);
                 if(isCached){
                     Toast.makeText(MainActivity.this, "Image was retrieved from the cache", Toast.LENGTH_SHORT).show();
                 }else{
                     Toast.makeText(MainActivity.this, "Image was downloaded from the internet", Toast.LENGTH_SHORT).show();
                 }
-                // TODO создать спиннер для выбора ссылок картинок для проверки кэша
+
                 // You can use ImageLoader by itself to display an image:
-                mImageLoader.get(IMAGE_URL, ImageLoader.getImageListener(mImageView,
+                mImageLoader.get(url, ImageLoader.getImageListener(mImageView,
                         android.R.drawable.alert_dark_frame, android.R.drawable.alert_dark_frame));
+
                 // However, NetworkImageView can do this for you
                 /* builds on ImageLoader and effectively replaces ImageView for situations
                  where your image is being fetched over the network via URL.
                  NetworkImageView also manages canceling pending requests
                  if the view is detached from the hierarchy. */
-                mNetworkImageView.setImageUrl(IMAGE_URL, mImageLoader);
+                //mNetworkImageView.setImageUrl(url, mImageLoader);
 
             }
         });
+
+
 
         mGson=new Gson();
 
@@ -161,11 +174,9 @@ public class MainActivity extends AppCompatActivity {
                         // Always runs on the main thread.
                         VolleyLog.d("Success; ");
                         Snackbar.make(mRootView,"Success!",Snackbar.LENGTH_SHORT);
-
                         // Operate on response data
                         mOutputTextView.setText("Response is:\n"+ response.toString());
-
-                        // Parse response
+                        // Parse response using Gson
                         Programmer programmer = mGson.fromJson(response.toString(),Programmer.class);
                         mOutputTextView.setText(mOutputTextView.getText()+"\n"+programmer.toString());
                     }
@@ -180,6 +191,7 @@ public class MainActivity extends AppCompatActivity {
         // you can set a tag on the request
         stringRequest.setTag(REQUEST_VASJA_PUPKIN);
         Log.d(TAG,"sending request: "+REQUEST_VASJA_PUPKIN);
+        Log.d(TAG,"cache key: "+stringRequest.getCacheKey());
         // Add the request to the RequestQueue.
         mRequestQueue.add(stringRequest);
         // or, following SingleTon pattern:
@@ -191,6 +203,26 @@ public class MainActivity extends AppCompatActivity {
             //stringRequest.cancel();
             Log.d(TAG,"canceling request: "+REQUEST_VASJA_PUPKIN);
         }
+    }
+
+    /** Download json data using our custom GsonRequest*/
+    private void downloadGson(){
+        GsonRequest<Programmer> gsonRequest = new GsonRequest<>(URL, Programmer.class, new HashMap<String, String>(),
+                new Response.Listener<Programmer>() {
+                    @Override
+                    public void onResponse(Programmer response) {
+                        mOutputTextView.setText(response.toString());
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                }
+        );
+        mRequestQueue.add(gsonRequest);
+
     }
 
     /** Retrieves an image specified by the URL, displays it in the UI. */
